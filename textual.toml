@@ -1,0 +1,4 @@
+[app.CMS]
+command = "python src/render-engine-cms/app.py test.app:app"
+
+
