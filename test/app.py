@@ -1,4 +1,4 @@
-from render_engine import Site, Collection
+from render_engine import Collection, Site
 
 app = Site()
 

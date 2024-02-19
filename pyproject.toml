@@ -35,8 +35,11 @@ pythonpath = ["src"]
 version_toml = "pyproject.toml:project.version"
 branch = "main"
 
-[tool.ruff]
-select = ["E", "F", "I", "UP"]
+[too.ruff]
 target-version = "py311"
 line-length = 120
 src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+

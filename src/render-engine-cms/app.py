@@ -1,82 +1,25 @@
+from logging import debug
 from sys import argv
 
+from editor import EditorScreen
+from render_engine.cli.cli import get_app, split_module_site
 from textual import on
 from textual.app import App, ComposeResult
-from textual.widgets import (
-    Header,
-    Footer,
-    Label,
-    ListView,
-    ListItem,
-    Markdown,
-)
-
+from textual.screen import Screen
 from textual.widget import Widget
-from render_engine.cli.cli import split_module_site, get_app
-from render_engine.collection import Collection
-from render_engine.page import Page
+from textual.widgets import (
+    Footer,
+    Header,
+    ListView,
+)
+from title_screen import (
+    CollectionSideBar,
+    MarkdownPreview,
+    files_in_collection,
+)
 
 module, app = split_module_site(argv[1])
 site = get_app(module, app)
-
-
-class FileLabel(Label):
-    def __init__(self, file: Page):
-        super().__init__(file.title)
-        self.content = file.content
-
-
-def files_in_collection(collection: Collection) -> list[ListItem]:
-    """Get a list of the files in a collection"""
-    return [
-        ListItem(
-            FileLabel(file),
-            name=file.__class__.__name__,
-        )
-        for file in collection.sorted_pages
-    ]
-
-
-class CollectionLabel(Label):
-    def __init__(self, collection: Collection):
-        super().__init__(collection.__class__.__name__)
-        self.collection = collection
-
-
-def get_collections(site):
-    """Get a list of the collections from the site route_list"""
-    return [collection for _, collection in site.route_list.items() if isinstance(collection, Collection)]
-
-
-def get_collection_labels(collections: list[Collection]) -> list[ListItem]:
-    """Get a list of the collections from the site route_list"""
-    return [
-        ListItem(
-            CollectionLabel(
-                collection,
-            ),
-            name=collection.__class__.__name__,
-            id=collection.__class__.__name__,
-        )
-        for collection in collections
-    ]
-
-
-class CollectionList(ListView):
-    """A list of collections"""
-
-
-class CollectionFiles(ListView):
-    """A widget for displaying the files in a collection"""
-
-
-class CollectionSideBar(Widget):
-    """A sidebar for the collections"""
-
-    def compose(self) -> ComposeResult:
-        collections = get_collections(site)
-        yield CollectionList(*get_collection_labels(collections), id="collection_list")
-        yield CollectionFiles(*files_in_collection(collections[0]), id="file_selection")
 
 
 class CollectionView(Widget):
@@ -95,20 +38,17 @@ class CollectionView(Widget):
     DEFAULT_CSS = """
     CollectionView {
         layout: horizontal;
-        }
-    CollectionSideBar {
-    width: 30%;
-    }
-    CollectionList {
-        height: 45%;
-        border: solid magenta;
-    }
-    CollectionFiles {
-        height: 45%;
-        border: solid magenta;
     }
 
-    Markdown {
+    CollectionSideBar {
+        width: 30%;
+    }
+
+    ListView .listview-sidebar {
+        height: 45%;
+        border: solid magenta;
+    }
+    .editor {
         width: 70%;
         border: solid cyan;
     }
@@ -117,7 +57,7 @@ class CollectionView(Widget):
     default_markdown = "Select a Page Title to View"
 
     def update_markdown(self, content: str) -> None:
-        md_viewer = self.query_one("#markdown_viewer", Markdown)
+        md_viewer = self.query_one("#markdown_viewer", MarkdownPreview)
         md_viewer.update(content)
 
     @on(ListView.Highlighted, "#file_selection")
@@ -137,13 +77,17 @@ class CollectionView(Widget):
 
     def compose(self) -> ComposeResult:
         yield CollectionSideBar()
-        yield Markdown(self.default_markdown, id="markdown_viewer")
+        yield MarkdownPreview(
+            self.default_markdown,
+            id="markdown_viewer",
+        )
 
 
 class CMS(App):
     """A Textual App that provides an CMS interface for Render Engine"""
 
     BINDINGS = [("q", "quit")]
+    SCREENS = {"editor": EditorScreen()}
 
     def compose(self) -> ComposeResult:
         """Compose the app UI"""
