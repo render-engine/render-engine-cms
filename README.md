@@ -4,6 +4,10 @@ A Textual Application designed to help create content for your website.
 
 ## Installation
 
+> **WARNING**
+> Currently the package is not in pip.
+> These steps will not work.
+
 You can install the package via pip:
 
 ```bash
