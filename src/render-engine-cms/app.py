@@ -45,11 +45,7 @@ class CollectionLabel(Label):
 
 def get_collections(site):
     """Get a list of the collections from the site route_list"""
-    return [
-        collection
-        for _, collection in site.route_list.items()
-        if isinstance(collection, Collection)
-    ]
+    return [collection for _, collection in site.route_list.items() if isinstance(collection, Collection)]
 
 
 def get_collection_labels(collections: list[Collection]) -> list[ListItem]:
@@ -112,8 +108,8 @@ class CollectionView(Widget):
         border: solid magenta;
     }
 
-    MarkdownViewer {
-        width: 65%;
+    Markdown {
+        width: 70%;
         border: solid cyan;
     }
     """
