@@ -13,7 +13,7 @@ from textual.widgets import (
     Markdown,
 )
 
-from editor import EditorScreen
+from editor import Editor, EditorScreen
 
 module, app = split_module_site(argv[1])
 site = get_app(module, app)
@@ -23,7 +23,6 @@ class FileLabel(Label):
     def __init__(self, file: Page):
         super().__init__(file.title)
         self.content = file.content
-        self.content_path = file.content_path
 
 
 def files_in_collection(collection: Collection) -> list[ListItem]:
@@ -80,12 +79,9 @@ class CollectionFiles(ListView):
 
     async def action_edit_file(self) -> None:
         if self.highlighted_child is not None:
-            content_path = self.highlighted_child.children[0].content_path
-            content = content_path.read_text()
+            content = self.highlighted_child.children[0].content
             await self.app.push_screen("editor")
-            editor = self.app.query_one("#file_editor")
-            editor.content_path = content_path
-            editor.load_text(content)
+            self.app.query_one("#file_editor").load_text(content)
 
 
 class CollectionSideBar(Widget):

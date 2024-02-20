@@ -88,6 +88,7 @@ class CMS(App):
 
     BINDINGS = [("q", "quit")]
     SCREENS = {"editor": EditorScreen()}
+    render_engine_module_app = [module, app]
 
     def compose(self) -> ComposeResult:
         """Compose the app UI"""
